@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Expense Tracker</title>
+    <style>
+    body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+}
+
+.container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+}
+
+.balance, .income-expense, .transaction-form {
+    margin: 20px 0;
+}
+
+.balance h2, .income h3, .expense h3 {
+    color: #555;
+}
+
+#balance, #income, #expense {
+    color: #333;
+}
+
+.transaction-form label {
+    display: block;
+    margin: 10px 0;
+}
+
+#text, #amount {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.button-transaction {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+.button-delete{
+    padding: 5px;
+    cursor: pointer;
+    background-color: #45a049;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+}
+.button-delete:hover {
+    background-color: #e74c3c;
+}
+li {
+    padding: 12px;
+    margin: 5px 0;
+    margin-top: 10px;
+    border-radius: 5px;
+    list-style-type: none;
+    width: 100%;
+}
+
+.income p, .expense p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.income {
+    color: #2ecc71;
+}
+
+.expense {
+    color:  #e74c3c;
+}
+.history{
+    font-size: 20px;
+    font-weight: bold;
+    width: fit-content;
+    color: #333;
+    margin:0px auto;
+    padding: 5px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form method="POST" >
+        {% csrf_token %}
+        <h1>Expense Tracker</h1>
+        <div class="balance">
+            <h2>Your Balance</h2>
+            <h3 id="balance">{{current_balance}}</h3>
+        </div>
+        <div class="income-expense">
+            <div class="income">
+                <h3>Income</h3>
+                <p id="income">{{income}}</p>
+            </div>
+            <div class="expense">
+                <h3>Expense</h3>
+                <p id="expense">{{expense}}</p>
+            </div>
+        </div>
+        
+        <div class="transaction-form">
+            <label for="text">Text</label>
+            <input type="text" id="text" name="description" placeholder="Enter description..." required>
+            <label for="amount">Amount <br>(negative - expense, positive - income)</label>
+            <input type="number" id="amount" name="amount" placeholder="Enter amount..." required>
+            <button  type="submit" class="button-transaction" >Add Transaction</button>
+        </div>
+        </form>
+        
+
+        <p class="history">History</p>
+        <ul style="padding: 0px;">
+            <!-- Transactions will be added here dynamically -->
+           {% for transaction in transactions %}
+  <li>
+    <span style="float: left;">{{ transaction.description }}</span>
+    <span  style="float: right;">
+      {{ transaction.amount }}
+      {% if transaction.expense_type == "CREDIT" %}
+        (CR)
+      {% else %}
+        (DR)
+      {% endif %}
+
+      <form method="POST" style="margin: 0px; display: inline;" action="{% url 'delete_transaction' transaction.id %}">
+        {% csrf_token %}
+        <button type="submit" class="button-delete">Delete</button>
+      </form>
+    </span>
+    
+  </li>
+{% endfor %}
+
+        </ul>
+    </div>
+    </form>
+</body>
+</html>
